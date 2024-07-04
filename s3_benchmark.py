@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     print(f'Running operation {operation}')
 
-    max_size = 20 * 1024 * 1024 * 1024  # Set max download size to 20GB
+    max_size = 10 * 1024 * 1024 * 1024  # Set max download size to 10GB
 
     if operation == 'download':
         download(mount_point, max_size)

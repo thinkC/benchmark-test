@@ -7,13 +7,20 @@ import time
 import numpy as np
 
 
-def download(mount_point):
+def download(mount_point, max_size):
     # Change current working directory to the mount_point
     os.chdir(mount_point)
-    result = os.system('wget https://uhhpc.herts.ac.uk/~mjh/test.tar')
+
+    # Calculate the range in bytes to download
+    range_end = max_size - 1  # Range is zero-based, so end at max_size - 1
+    range_header = f"Range: bytes=0-{range_end}"
+
+    result = os.system(
+        f'wget --header="{range_header}" https://uhhpc.herts.ac.uk/~mjh/test.tar -O partial_test.tar')
     if result != 0:
         raise RuntimeError('Download failed!')
-    result = os.system('tar xvf test.tar')
+
+    result = os.system('tar xvf partial_test.tar')
     if result != 0:
         raise RuntimeError('Untar failed!')
 
@@ -39,11 +46,13 @@ if __name__ == '__main__':
 
     print(f'Running operation {operation}')
 
+    max_size = 20 * 1024 * 1024 * 1024  # Set max download size to 20GB
+
     if operation == 'download':
-        download(mount_point)
+        download(mount_point, max_size)
     elif operation == 'benchmark':
         if not os.path.isdir('test.ms'):
-            download(mount_point)
+            download(mount_point, max_size)
         times = []
         count = 5
         for i in tqdm(range(count)):
